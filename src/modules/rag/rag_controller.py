@@ -24,7 +24,9 @@ def ingest_documents():
       detail=f'Folder `{folder_path}` does not exist.',
     )
 
-  files_by_name = {f.name: f for f in folder.iterdir() if f.is_file()}
+  file_name_black_list = ['.gitkeep']
+  files_by_name = {f.name: f for f in folder.iterdir() if f.is_file() and f.name not in file_name_black_list}
+  
   result = ingest_documents_fn(files_by_name)
 
   return {
