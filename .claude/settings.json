@@ -1,0 +1,10 @@
+{
+  "model": "sonnet[1m]",
+  "effortLevel": "high",
+  "permissions": {
+    "deny": ["Read(.env)"],
+    "allow": ["Read(./docs/superpowers/)"],
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable"
+  }
+}

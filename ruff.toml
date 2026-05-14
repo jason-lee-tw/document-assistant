@@ -1,0 +1,10 @@
+line-length = 88
+target-version = "py313"
+indent-width = 2
+
+[lint]
+select = ["E", "F", "I", "UP"]
+
+[format]
+quote-style = "single"
+indent-style = "space"

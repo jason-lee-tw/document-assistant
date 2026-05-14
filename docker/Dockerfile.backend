@@ -1,0 +1,21 @@
+FROM python:3.14-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/src \
+    PENDING_DIGEST_FOLDER_PATH=/sample-docs
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+
+# Install dependencies ahead of source copy for better layer caching
+COPY pyproject.toml ./
+RUN uv pip install --system --no-cache .
+
+COPY src/ ./src/
+COPY sample-docs/ /sample-docs/
+
+EXPOSE 3001
+
+CMD ["python", "src/main.py"]

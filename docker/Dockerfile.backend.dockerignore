@@ -1,0 +1,20 @@
+# Environment variables
+.env*
+
+# Documentation
+docs/
+CLAUDE.md
+README.md
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Virtual environment
+.venv/
+
+# Docker files (not needed in build context)
+docker/
+docker-compose.yml

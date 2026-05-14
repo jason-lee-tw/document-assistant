@@ -1,0 +1,18 @@
+FROM python:3.14-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+
+RUN uv pip install --system --no-cache \
+    "alembic>=1.13" \
+    "sqlalchemy>=2" \
+    "psycopg[binary]>=3.2"
+
+COPY alembic.ini ./
+COPY src/migrations ./src/migrations
+
+CMD ["alembic", "upgrade", "head"]
