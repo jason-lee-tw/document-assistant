@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from modules.chat.chat_service import (
   process_chat,
   process_chat_with_lcel,

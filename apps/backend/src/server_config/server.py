@@ -3,7 +3,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-
 from server_config.tracer import register_phoenix_tracer
 
 

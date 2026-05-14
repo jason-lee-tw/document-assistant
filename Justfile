@@ -46,6 +46,11 @@ clean-python:
 lint:
   @uv run ruff check .
 
+# Lint with fix
+[group: "Format"]
+lint-fix:
+  @uv run ruff check . --fix
+
 # Format
 [group: "Format"]
 format:

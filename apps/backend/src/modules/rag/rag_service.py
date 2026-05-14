@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from ai_agents.rag.embedding import embedding, get_vector_store, make_chunk_id
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-from ai_agents.rag.embedding import embedding, get_vector_store, make_chunk_id
 
 
 def filter_pending_documents(document_names: list[str]) -> list[str]:

@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-
 from server_config.server import start_app
 
 

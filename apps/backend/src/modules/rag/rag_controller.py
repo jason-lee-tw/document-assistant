@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
-
 from modules.rag.rag_service import ingest_documents as ingest_documents_fn
 
 router = APIRouter(prefix='/rag')
@@ -25,8 +24,12 @@ def ingest_documents():
     )
 
   file_name_black_list = ['.gitkeep']
-  files_by_name = {f.name: f for f in folder.iterdir() if f.is_file() and f.name not in file_name_black_list}
-  
+  files_by_name = {
+    f.name: f
+    for f in folder.iterdir()
+    if f.is_file() and f.name not in file_name_black_list
+  }
+
   result = ingest_documents_fn(files_by_name)
 
   return {

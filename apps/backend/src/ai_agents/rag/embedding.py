@@ -1,6 +1,5 @@
-from langchain_core.documents import Document
-
 from ai_agents.rag.vector_store import get_vector_store
+from langchain_core.documents import Document
 
 
 def make_chunk_id(document_name: str, chunk_index: int) -> str:

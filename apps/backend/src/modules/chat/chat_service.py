@@ -1,5 +1,7 @@
 from typing import Any
 
+from ai_agents.base_agent import BaseAgent
+from ai_agents.rag.retrieving import get_retriever
 from fastapi import HTTPException
 from langchain_core.documents import Document
 from langchain_core.messages import (
@@ -12,9 +14,6 @@ from langchain_core.messages import (
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
-
-from ai_agents.base_agent import BaseAgent
-from ai_agents.rag.retrieving import get_retriever
 from modules.chat.dto.chat_dto import ChatHistoryDTO
 
 
