@@ -9,7 +9,7 @@ init:
 # Run all apps with Docker
 [group: "App"]
 up-build:
-  @docker compose -f ./docker-compose.yml up --build -w
+  @docker compose --env-file ./apps/backend/.env -f ./docker-compose.yml up --build -w
 
 # Stop all apps
 [group: "App"]

@@ -5,7 +5,7 @@ services:
       dockerfile: docker/Dockerfile.backend
     network_mode: host
     env_file:
-      - ./.env
+      - ./apps/backend/.env
     environment:
       PORT: "${PORT}"
       PHOENIX_COLLECTOR_ENDPOINT: "http://localhost:4317"
@@ -23,7 +23,7 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src
+          path: ./apps/backend/src
           target: /app/src
           ignore:
             - __pycache__/
@@ -33,7 +33,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migration
     env_file:
-      - ./.env
+      - ./apps/backend/.env
     environment:
       DB_HOST: pgvector
     depends_on:
@@ -58,7 +58,7 @@ services:
       timeout: 5s
       retries: 5
     env_file:
-      - ./.env
+      - ./apps/backend/.env
 
   phoenix:
     image: arizephoenix/phoenix:latest
@@ -78,7 +78,7 @@ services:
   ollama-checker:
     image: curlimages/curl:latest
     env_file:
-      - ./.env
+      - ./apps/backend/.env
     network_mode: host
     volumes:
       - ./docker/ollama-checker.sh:/scripts/ollama-checker.sh:ro

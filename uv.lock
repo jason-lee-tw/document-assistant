@@ -2,6 +2,11 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[manifest]
+members = [
+    "rag-document-assistant",
+]
+
 [[package]]
 name = "annotated-doc"
 version = "0.0.4"
@@ -984,7 +989,7 @@ wheels = [
 [[package]]
 name = "rag-document-assistant"
 version = "0.1.0"
-source = { virtual = "." }
+source = { virtual = "apps/backend" }
 dependencies = [
     { name = "arize-phoenix-otel" },
     { name = "fastapi" },
