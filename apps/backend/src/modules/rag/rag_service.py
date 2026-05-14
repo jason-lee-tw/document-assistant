@@ -30,7 +30,7 @@ def ingest_documents(files_by_name: dict[str, Path]) -> IngestDocuments:
   if not pending_names:
     return IngestDocuments(ingested=[], skipped=sorted(files_by_name.keys()))
 
-  splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+  splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
   documents: list[Document] = []
   ids: list[str] = []
