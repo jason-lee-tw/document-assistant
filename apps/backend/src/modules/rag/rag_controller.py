@@ -41,7 +41,7 @@ def ingest_documents():
 
 
 @router.post('/crawl')
-def crawl_documents(body: CrawlDocumentsReqDTO):
+async def crawl_documents(body: CrawlDocumentsReqDTO):
   urls = body.url_list
-  result = crawl_documents_fn(urls)
+  result = await crawl_documents_fn(urls)
   return result

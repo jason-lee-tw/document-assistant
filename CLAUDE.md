@@ -42,3 +42,11 @@ uv run pytest    # runs *_test.py files (co-located with source)
 - Backend container uses `network_mode: host` so it can reach Ollama on `localhost:11434` — don't switch networks without re-pointing `OLLAMA_BASE_URL`.
 - `apps/backend` is a uv workspace member but the `.venv` lives at the repo root; always `uv sync` from root, never from `apps/backend`.
 - `scripts/` and `docs/` must not be moved or renamed.
+
+# Plan-first before execute
+
+- When given a task, firstly, ALWAYS analyse deeply to understand what the user actually want.
+- Once you are clear on the scope and the details of the task, then start planning.
+- ALWAYS review your plan before asking for human review the plan. Apply 5-why rules when reviewing the plan.
+- NEVER make any assumption. Always clarify or ask question.
+- NEVER start execution before human confirm the plan.

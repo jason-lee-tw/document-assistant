@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import uuid7
 
 from ai_agents.rag.embedding import (
+  batch_embedding,
   embedding,
   get_splitter,
   get_vector_store,
@@ -10,9 +11,8 @@ from ai_agents.rag.embedding import (
 )
 from ai_agents.tavily.tavily_client import (
   TavilyClient,
-  TavilyCrawlResponse,
-  TavilyCrawlResult,
 )
+from ai_agents.tavily.tavily_crawl import TavilyCrawlResult
 from constants.vector_collection import VECTOR_STORE_COLLECTION_NAME
 from langchain_core.documents import Document
 from modules.rag.dto.crawl_documents import (
@@ -76,7 +76,7 @@ def ingest_documents(files_by_name: dict[str, Path]) -> IngestDocumentsResDTO:
   return IngestDocumentsResDTO(ingested=sorted(pending_names), skipped=skipped_names)
 
 
-def crawl_documents(url_list: list[str]) -> CrawlDocumentsResDTO:
+async def crawl_documents(url_list: list[str]) -> CrawlDocumentsResDTO:
   tavily = TavilyClient()
   logger = Logger(__name__)
 
@@ -88,13 +88,17 @@ def crawl_documents(url_list: list[str]) -> CrawlDocumentsResDTO:
   # Crawl documents and process the crawl result (embed and store)
   for url in url_list:
     raw_res = tavily.crawler.invoke(
-      {'url': url, 'max_depth': 1, 'extract_depth': 'advanced'}
+      {'url': url, 'max_depth': 3, 'extract_depth': 'advanced'}
     )
-    parsed_res = TavilyCrawlResponse.model_validate(raw_res, strict=True)
+    parsed_res = TavilyClient.parse_crawler_response(raw_response=raw_res)
+
+    logger.log(f'Successfully crawled documents from {url}')
 
     documents = parsed_res.results
 
-    document_id_list, chunk_id_list = _process_crawled_document(documents=documents)
+    document_id_list, chunk_id_list = await _process_crawled_document(
+      documents=documents
+    )
     full_document_id_list.extend(document_id_list)
     full_chunk_id_list.extend(chunk_id_list)
 
@@ -108,7 +112,7 @@ def crawl_documents(url_list: list[str]) -> CrawlDocumentsResDTO:
   )
 
 
-def _process_crawled_document(
+async def _process_crawled_document(
   documents: list[TavilyCrawlResult],
 ) -> tuple[list[str], list[str]]:
   """
@@ -117,8 +121,9 @@ def _process_crawled_document(
   Returns:
     List of stored document chunk ID.
   """
-  document_id_list: list[str] = []
+  full_document_id_list: list[str] = []
   full_chunk_id_list: list[str] = []
+  full_chunk_doc_list: list[Document] = []
 
   for doc in documents:
     doc_id = str(uuid7())
@@ -134,16 +139,14 @@ def _process_crawled_document(
       metadata=metadata,
     )
 
-    chunk_id_list = [key for key in chunk_map.keys()]
-    chunk_doc = [value for value in chunk_map.values()]
+    full_document_id_list.append(doc_id)
+    full_chunk_id_list.extend([key for key in chunk_map.keys()])
+    full_chunk_doc_list.extend([value for value in chunk_map.values()])
 
-    embedding(
-      documents=chunk_doc,
-      ids=chunk_id_list,
-      collection_name=VECTOR_STORE_COLLECTION_NAME.CLAWLED_DOCUMENTS,
-    )
+  await batch_embedding(
+    documents=full_chunk_doc_list,
+    ids=full_chunk_id_list,
+    collection_name=VECTOR_STORE_COLLECTION_NAME.CLAWLED_DOCUMENTS,
+  )
 
-    document_id_list.append(doc_id)
-    full_chunk_id_list.extend(chunk_id_list)
-
-  return document_id_list, full_chunk_id_list
+  return full_document_id_list, full_chunk_id_list
