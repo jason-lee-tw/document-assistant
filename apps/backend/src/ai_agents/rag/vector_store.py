@@ -1,5 +1,6 @@
 import os
 
+from constants.vector_collection import VECTOR_STORE_COLLECTION_NAME
 from langchain.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 from langchain_ollama import OllamaEmbeddings
@@ -18,7 +19,9 @@ def get_embedding_model() -> Embeddings:
   )
 
 
-def get_vector_store() -> VectorStore:
+def get_vector_store(
+  collection_name: VECTOR_STORE_COLLECTION_NAME | None = None,
+) -> VectorStore:
   DB_USER = os.getenv('DB_USER')
   DB_PASSWORD = os.getenv('DB_PASSWORD')
   DB_HOST = os.getenv('DB_HOST')
@@ -38,6 +41,6 @@ def get_vector_store() -> VectorStore:
     embeddings=model,
     connection=connection_string,
     use_jsonb=True,
-    collection_name='rag-document-assistant-documents',
+    collection_name=collection_name or VECTOR_STORE_COLLECTION_NAME.DEFAULT,
     collection_metadata={'topic': 'documents'},
   )

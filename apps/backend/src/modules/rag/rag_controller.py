@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
+from modules.rag.dto.crawl_documents import CrawlDocumentsReqDTO
+from modules.rag.rag_service import crawl_documents as crawl_documents_fn
 from modules.rag.rag_service import ingest_documents as ingest_documents_fn
 
 router = APIRouter(prefix='/rag')
@@ -36,3 +38,10 @@ def ingest_documents():
     'ingested': result.ingested,
     'skipped': result.skipped,
   }
+
+
+@router.post('/crawl')
+def crawl_documents(body: CrawlDocumentsReqDTO):
+  urls = body.url_list
+  result = crawl_documents_fn(urls)
+  return result
