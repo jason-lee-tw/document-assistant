@@ -2,7 +2,9 @@ from typing import Any
 
 from ai_agents.base_agent import BaseAgent
 from ai_agents.rag.retrieving import get_retriever
+from ai_agents.tools.document_search_tool import retrieve_context
 from fastapi import HTTPException
+from langchain.agents import create_agent
 from langchain_core.documents import Document
 from langchain_core.messages import (
   AIMessage,
@@ -146,3 +148,48 @@ def process_chat_with_lcel(chat_list: list[ChatHistoryDTO]) -> AIMessage:
   result = chain.invoke({'question': user_query})
 
   return AIMessage(result)
+
+
+def process_chat_with_rag_tool(chat_list: list[ChatHistoryDTO]) -> dict[str, Any]:
+  """
+  Run the RAG pipeline to answer user query with the documents.
+
+  Args:
+    chat_list: The list of chat history including the latest user message.
+
+  Returns:
+    Dictionary containing:
+      - answer: The LLM generated answer. This is an AIMessage object.
+      - context: A list of documents. This is a list of Document object.
+  """
+
+  system_prompt = """You are a useful AI assistant that answers users' questions.
+You have access to a tool that retrieves relevant documents.
+Use the tool to find relevant information before answering the questions.
+Always cite the sources you used in your answers.
+If you cannot find any information from the documents, please say so.
+"""
+
+  model = BaseAgent().get_model()
+  agent = create_agent(
+    model=model, tools=[retrieve_context], system_prompt=system_prompt
+  )
+  parsed_chat_list = _convert_chat_list(chat_list)
+
+  agent_res = agent.invoke({'messages': parsed_chat_list})
+
+  answer: str = agent_res['messages'][-1].content
+  document_list = _get_documents_from_message_list(agent_res['messages'])
+
+  return {'answer': answer, 'context': document_list}
+
+
+def _get_documents_from_message_list(message_list: list[BaseMessage]) -> list[Document]:
+  context_docs = []
+
+  for message in message_list:
+    if isinstance(message, ToolMessage) and hasattr(message, 'artifact'):
+      if isinstance(message.artifact, list):
+        context_docs.extend(message.artifact)
+
+  return context_docs

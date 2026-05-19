@@ -1,5 +1,6 @@
 from typing import Literal
 
+from langchain_core.documents import Document
 from pydantic import BaseModel
 
 
@@ -14,4 +15,4 @@ class ChatReqDTO(BaseModel):
 
 
 class ChatResDTO(ChatReqDTO):
-  pass
+  context: list[Document] | None = None
