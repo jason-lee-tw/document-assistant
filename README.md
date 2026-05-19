@@ -117,7 +117,44 @@ Available chat endpoints:
 - `POST /chat/with-lcel`  — same pipeline expressed as an LCEL chain
 - `POST /chat/with-rag-tool` — Claude as an agent calling a retrieval tool
 
-### 2.5 Common dev commands
+### 2.5 Database migrations
+
+Schema is managed with **Alembic**, and you do not need to run it by hand —
+`just up-all` (or any `docker compose up`) will apply migrations automatically
+before the backend starts.
+
+How it is wired:
+
+- **Migration scripts** live under
+  [`apps/backend/src/migrations/`](apps/backend/src/migrations/):
+  - `env.py` — Alembic environment, reads DB connection from env vars.
+  - `script.py.mako` — template used when generating a new revision.
+  - `versions/` — one file per revision (e.g. `0001_init_vector_extension.py`,
+    which installs the `pgvector` extension). **All new revisions go here.**
+- **One-shot migration container** is defined as the `db-migration` service in
+  [`docker-compose.yml`](docker-compose.yml). It is built from
+  [`docker/Dockerfile.migration`](docker/Dockerfile.migration) — a slim Python
+  3.14 image that installs `alembic`, `sqlalchemy`, `psycopg[binary]`, copies
+  `alembic.ini` plus `src/migrations/`, and on start runs:
+
+  ```bash
+  alembic upgrade head
+  ```
+
+- **Ordering guarantees** in compose:
+  - `db-migration` `depends_on` `pgvector` being `service_healthy`, so the DB
+    is reachable before migrations run.
+  - `backend` `depends_on` `db-migration` with
+    `condition: service_completed_successfully`, so the API never boots
+    against an un-migrated schema.
+  - `restart: "no"` keeps the migration container as a one-shot — it exits 0
+    on success and is not restarted.
+
+To add a new migration, drop a new file in
+`apps/backend/src/migrations/versions/` (or generate one via
+`uv run alembic revision -m "..."`); the next `just up-all` will pick it up.
+
+### 2.6 Common dev commands
 
 ```bash
 just lint            # ruff check
