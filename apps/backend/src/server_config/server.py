@@ -3,6 +3,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from server_config.tracer import register_phoenix_tracer
 
 
@@ -10,6 +11,7 @@ def start_app():
   load_dotenv()
   register_phoenix_tracer()
   app = FastAPI(title='Chat Bot API', version='1.0.0', docs_url='/docs')
+  FastAPIInstrumentor.instrument_app(app)
 
   src_root = Path(__file__).parent.parent
 

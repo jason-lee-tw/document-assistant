@@ -14,7 +14,7 @@ def test_register_uses_default_endpoint_when_env_not_set():
     register_phoenix_tracer()
     mock_register.assert_called_once_with(
       endpoint='http://localhost:4317',
-      project_name='chat-bot',
+      project_name='rag-document-assistant',
       protocol='grpc',
       batch=True,
     )
@@ -30,7 +30,7 @@ def test_register_uses_custom_endpoint_from_env():
     register_phoenix_tracer()
     mock_register.assert_called_once_with(
       endpoint=custom,
-      project_name='chat-bot',
+      project_name='rag-document-assistant',
       protocol='grpc',
       batch=True,
     )
